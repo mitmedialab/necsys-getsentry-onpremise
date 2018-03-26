@@ -65,5 +65,10 @@ target/
 # pyenv
 .python-version
 
+# editor swap files
+.*.swp
+*~
+
 *.tar
 data/
+sentry.env
