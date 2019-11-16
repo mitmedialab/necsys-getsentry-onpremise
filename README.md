@@ -1,40 +1,62 @@
-# Sentry On-Premise
+# Sentry 10 On-Premise BETA [![Build Status][build-status-image]][build-status-url]
 
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
 
+**NOTE:** If you are not installing Sentry from scratch, visit [On-Premise Stable for Sentry 9.1.2](https://github.com/getsentry/onpremise/tree/stable) as this version is not fully backward compatible.
+
 ## Requirements
 
- * Docker 1.10.0+
- * Compose 1.6.0+ _(optional)_
+ * Docker 17.05.0+
+ * Compose 1.19.0+
 
-## Up and Running
+## Minimum Hardware Requirements:
 
-Assuming you've just cloned this repository, the following steps
-will get you up and running in no time!
+ * You need at least 2400MB RAM
 
-There may need to be modifications to the included `docker-compose.yml` file to accommodate your needs or your environment. These instructions are a guideline for what you should generally do.
+## Setup
 
-1. `mkdir -p data/{sentry,postgres}` - Make our local database and sentry config directories.
-    This directory is bind-mounted with postgres so you don't lose state!
-2. `docker-compose run --rm web config generate-secret-key` - Generate a secret key.
-    Add it to `docker-compose.yml` in `base` as `SENTRY_SECRET_KEY`.
-3. `docker-compose run --rm web upgrade` - Build the database.
-    Use the interactive prompts to create a user account.
-4. `docker-compose up -d` - Lift all services (detached/background mode).
-5. Access your instance at `localhost:9000`!
+To get started with all the defaults, simply clone the repo and run `./install.sh` in your local check-out.
 
-Note that as long as you have your database bind-mounted, you should
-be fine stopping and removing the containers without worry.
+There may need to be modifications to the included example config files (`sentry/config.example.yml` and `sentry/sentry.conf.example.py`) to accommodate your needs or your environment (such as adding GitHub credentials). If you want to perform these, do them before you run the install script and copy them without the `.example` extensions in the name (such as `sentry/sentry.conf.py`) before running the `install.sh` script.
+
+The recommended way to customize your configuration is using the files below, in that order:
+
+ * `config.yml`
+ * `sentry.conf.py`
+ * `.env` w/ environment variables
+
+We currently support a very minimal set of environment variables to promote other means of configuration.
+
+If you have any issues or questions, our [Community Forum](https://forum.sentry.io/c/on-premise) is at your service!
+
+## Event Retention
+
+Sentry comes with a cleanup cron job that prunes events older than `90 days` by default. If you want to change that, you can change the `SENTRY_EVENT_RETENTION_DAYS` environment variable in `.env` or simply override it in your environment. If you do not want the cleanup cron, you can remove the `sentry-cleanup` service from the `docker-compose.yml`file.
 
 ## Securing Sentry with SSL/TLS
 
 If you'd like to protect your Sentry install with SSL/TLS, there are
 fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/)
-and [Nginx](http://nginx.org/).
+and [Nginx](http://nginx.org/). You'll likely want to add this service to your `docker-compose.yml` file.
+
+## Updating Sentry
+
+Updating Sentry using Compose is relatively simple. Just use the following steps to update. Make sure that you have the latest version set in your Dockerfile. Or use the latest version of this repository.
+
+Use the following steps after updating this repository or your Dockerfile:
+```sh
+docker-compose build --pull # Build the services again after updating, and make sure we're up to date on patch version
+docker-compose run --rm web upgrade # Run new migrations
+docker-compose up -d # Recreate the services
+```
 
 ## Resources
 
  * [Documentation](https://docs.sentry.io/server/installation/docker/)
- * [Bug Tracker](https://github.com/getsentry/onpremise)
+ * [Bug Tracker](https://github.com/getsentry/onpremise/issues)
  * [Forums](https://forum.sentry.io/c/on-premise)
  * [IRC](irc://chat.freenode.net/sentry) (chat.freenode.net, #sentry)
+
+
+[build-status-image]: https://api.travis-ci.com/getsentry/onpremise.svg?branch=master
+[build-status-url]: https://travis-ci.com/getsentry/onpremise

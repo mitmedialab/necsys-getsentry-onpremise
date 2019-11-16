@@ -42,7 +42,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*,cover
+*.cover
 .hypothesis/
 
 # Translations
@@ -64,11 +64,21 @@ target/
 
 # pyenv
 .python-version
+# https://docs.docker.com/compose/extends/
+docker-compose.override.yml
+
+*.tar
+data/
+.vscode/tags
+
+# custom Sentry config
+sentry/sentry.conf.py
+sentry/config.yml
+sentry/requirements.txt
 
 # editor swap files
 .*.swp
 *~
 
-*.tar
-data/
+# local env file
 sentry.env
